@@ -12,8 +12,8 @@ skinparam PackageStyle rectangle
 left to right direction
 
 ' --- ACTORS ---
-actor "User" as U 
-actor "Sassy Me" as SM <<System>> #Fuchsia/DeepPink
+actor "Guest" as G 
+actor "User" as U
 
 ' --- SYSTEM BOUNDARY ---
 rectangle "Sassy Me (Rate My Life)"#Physical {
@@ -25,16 +25,7 @@ rectangle "Sassy Me (Rate My Life)"#Physical {
 
     package "Content Management"#business {
         usecase "Create New Post" as NP 
-        usecase "Rate with Stars" as RATE 
-        usecase "Add Tags" as TAGS 
         usecase "Mark as Favorite" as FAV 
-        usecase "Add picture" as PIC
-        
-        ' Relationships: Posting includes these steps
-        NP <.. RATE : <<include>>
-        NP <.. PIC : <<include>>
-        NP <.. TAGS : <<include>>
-        NP <.. FAV : <<include>>
     }
 
     package "Social"#business  {
@@ -46,17 +37,14 @@ rectangle "Sassy Me (Rate My Life)"#Physical {
 }
 
 ' --- CONNECTIONS ---
-U -- L
+G -- L
+G <|-- U
 U -- MP
 U -- NP
 U -- SF
 U -- FF
 U -- CP
 U -- AF
+U -- FAV
 
-' The system handles the logic for these
-L -- SM
-NP -- SM
-SF -- SM
-FF -- SM
 @enduml

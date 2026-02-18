@@ -78,27 +78,25 @@ class Profile {
 
 ' Relationships
 
-User ||--|| Profile : has
-User ||--o{ Post : creates
-User ||--o{ Comment : writes
-User ||--o{ Favorite : creates
+User "1" -- "1" Profile : has > 
+User "1" -- "*" Post : creates >
+User "1" -- "*" Comment : writes >
+User "1" -- "*" Favorite : creates  >
+User "*" -- "*" User : followed_by >
 
-Post ||--o{ Comment : has
-Post }|--|| Tag : tagged_with
-Post ||--o{ Favorite : favorited_by
+Follow "*" -- "1" User : follower >
+Follow "*" -- "1" User : followed_by >
 
-Comment }o--|| User : written_by
-Comment }o--|| Post : belongs_to
+Post "1" -- "*" Comment : has >
+Post "*" --"*" Tag : tagged_with >
+Post "1" -- "1" Favorite : of_post >
 
-Favorite }o--|| User : created_by
-Favorite }o--|| Post : favorites
+Comment "*"--"1" User : written_by >
+Comment "*" -- "1" Post : belongs_to >
 
-User ||--o{ Follow : follows
-Follow }o--|| User : followed_by
+Feed "1" -- "*" Post : contains >
+Feed "1" -- "1" User : belongs_to >
 
-Feed ||--o{ Post : contains
-Feed }o--|| User : belongs_to
-
-Tag }o--|| TagType : categorized_as
+Tag "*" -- "1" TagType : categorized_as >
 
 @enduml

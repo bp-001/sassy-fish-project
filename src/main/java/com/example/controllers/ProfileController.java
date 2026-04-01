@@ -1,20 +1,36 @@
 package com.example.controllers;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.example.MainWin;
+import com.example.data_access.CurrentUserContext;
+import com.example.data_access.DbAccessManager;
+import com.example.usermodel.Post;
 import com.example.usermodel.User;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 
 public class ProfileController {
+    private static final ObservableList<String> LOCATION_OPTIONS = FXCollections.observableArrayList(
+            "New York", "Los Angeles", "Chicago", "Houston", "Miami");
+
     @FXML private TextField usernameField;
     @FXML private TextField bioField;
     @FXML private ComboBox<String> locationComboBox;
+    @FXML private ListView<String> postsListView;
+    @FXML private Label postsCountLabel;
     @FXML private Label errorLabel;
     @FXML private ImageView profileImageView; 
     @FXML private ImageView favourite1;
@@ -32,6 +48,7 @@ public class ProfileController {
 
     @FXML
     public void initialize() {
+        setupLocationComboBox();
         //manageProfileUseCase = new ManageProfileUseCase(); (TO SOLVE: Use case integration)
         loadUserProfile();
         setEditMode(false);
@@ -39,20 +56,37 @@ public class ProfileController {
         setupHoverEffect();
     }
 
+    private void setupLocationComboBox() {
+        locationComboBox.setItems(LOCATION_OPTIONS);
+        locationComboBox.setVisibleRowCount(5);
+        locationComboBox.setOnMousePressed(event -> {
+            if (!locationComboBox.isShowing()) {
+                locationComboBox.show();
+            }
+        });
+    }
+
     private void loadUserProfile() {
         try {
-            // Simulación de carga de usuario actual (TO SOLVE: Integrar con base de datos)
-            currentUser = new User("sassy_user", "Sassy User");
-            currentUser.setBio("This is my bio!");
-            currentUser.setLocation("New York");
-            //currentUser.setProfilePicturePath("path/to/profile/picture.jpg");
+            String username = CurrentUserContext.getUsername();
+
+            try (DbAccessManager dbManager = new DbAccessManager()) {
+                currentUser = dbManager.findUserByUsername(username);
+                if (currentUser == null) {
+                    currentUser = new User(username, username + "@example.com");
+                    currentUser.setBio("");
+                    currentUser.setLocation("New York");
+                    dbManager.saveUser(currentUser);
+                }
+            }
+
             usernameField.setText(currentUser.getUsername());
-            bioField.setText(currentUser.getBio());
-            locationComboBox.getItems().addAll("New York", "Los Angeles", "Chicago", "Houston", "Miami");
+            bioField.setText(currentUser.getBio() == null ? "" : currentUser.getBio());
             locationComboBox.setValue(currentUser.getLocation());
             if (currentUser.getProfilePicturePath() != null) {
                 profileImageView.setImage(new Image(currentUser.getProfilePicturePath()));
-            } 
+            }
+            refreshPostsSection();
         } catch (Exception e) {
             errorLabel.setText("Error loading profile: " + e.getMessage());
         }
@@ -83,7 +117,13 @@ public class ProfileController {
             currentUser.setUsername(usernameField.getText());
             currentUser.setBio(bioField.getText());
             currentUser.setLocation(locationComboBox.getValue());
-            //manageProfileUseCase.updateProfile(currentUser); (TO SOLVE: Integrar con el caso de uso)
+
+            try (DbAccessManager dbManager = new DbAccessManager()) {
+                currentUser = dbManager.updateUser(currentUser);
+            }
+
+            CurrentUserContext.setUsername(currentUser.getUsername());
+            refreshPostsSection();
             setEditMode(false);
         } catch (Exception e) {
             errorLabel.setText("Error saving profile: " + e.getMessage());
@@ -97,7 +137,7 @@ public class ProfileController {
         //Textos a editar
         usernameField.setEditable(editing);
         bioField.setEditable(editing);
-        locationComboBox.setDisable(!editing);
+        locationComboBox.setDisable(false);
 
         //Vista de botones
         editButton.setDisable(editing);
@@ -118,6 +158,11 @@ public class ProfileController {
         setEditMode(false);
     }
 
+    @FXML
+    private void handleBackToFeed() {
+        MainWin.showFeed();
+    }
+
     private void setupHoverEffect(){
         profileImageView.setOnMouseEntered(e -> {
             editIconView.setVisible(true);
@@ -126,5 +171,52 @@ public class ProfileController {
         profileImageView.setOnMouseExited(e -> {
             editIconView.setVisible(false);
         });
+    }
+
+    private void refreshPostsSection() {
+        if (currentUser == null || currentUser.getPosts() == null) {
+            postsListView.setItems(FXCollections.observableArrayList());
+            postsCountLabel.setText("Posts: 0");
+            clearFavouritePreview();
+            return;
+        }
+
+        List<Post> sortedPosts = currentUser.getPosts().stream()
+                .sorted(Comparator.comparing(Post::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
+                .collect(Collectors.toList());
+
+        List<String> postLines = sortedPosts.stream()
+                .map(post -> {
+                    String title = post.getTitle() == null || post.getTitle().isBlank() ? "Untitled" : post.getTitle();
+                    String date = post.getDate() == null ? "no-date" : post.getDate().toString();
+                    return date + " - " + title;
+                })
+                .collect(Collectors.toList());
+
+        postsListView.setItems(FXCollections.observableArrayList(postLines));
+        postsCountLabel.setText("Posts: " + sortedPosts.size());
+        updateFavouritePreview(sortedPosts);
+    }
+
+    private void updateFavouritePreview(List<Post> posts) {
+        clearFavouritePreview();
+        List<Post> favourites = posts.stream()
+                .filter(Post::getIsFavourite)
+                .limit(3)
+                .collect(Collectors.toList());
+
+        ImageView[] slots = {favourite1, favourite2, favourite3};
+        for (int i = 0; i < favourites.size(); i++) {
+            String imagePath = favourites.get(i).getImagePath();
+            if (imagePath != null && !imagePath.isBlank()) {
+                slots[i].setImage(new Image(imagePath, true));
+            }
+        }
+    }
+
+    private void clearFavouritePreview() {
+        favourite1.setImage(null);
+        favourite2.setImage(null);
+        favourite3.setImage(null);
     }
 }

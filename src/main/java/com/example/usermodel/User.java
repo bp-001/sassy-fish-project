@@ -1,10 +1,15 @@
 package com.example.usermodel;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,6 +29,9 @@ public class User {
     private String username;
     private String email;
     private String profilePicturePath;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     public User() {
     }   //Default constructor for JPA  
@@ -52,6 +60,36 @@ public class User {
     public String getProfilePicturePath() { return profilePicturePath; }
     public void setProfilePicturePath(String profilePicturePath) { 
         this.profilePicturePath = profilePicturePath;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts.clear();
+        if (posts == null) {
+            return;
+        }
+        for (Post post : posts) {
+            addPost(post);
+        }
+    }
+
+    public void addPost(Post post) {
+        if (post == null || posts.contains(post)) {
+            return;
+        }
+        posts.add(post);
+        post.setUser(this);
+    }
+
+    public void removePost(Post post) {
+        if (post == null) {
+            return;
+        }
+        posts.remove(post);
+        post.setUser(null);
     }
 
     

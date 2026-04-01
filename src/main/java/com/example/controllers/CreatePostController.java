@@ -5,8 +5,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+import com.example.MainWin;
+import com.example.data_access.CurrentUserContext;
+import com.example.data_access.DbAccessManager;
 import com.example.usermodel.Post;
 import com.example.usermodel.Tag;
+import com.example.usermodel.User;
 
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -15,10 +19,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -38,7 +45,7 @@ public class CreatePostController {
 
     // TITLE
     @FXML private Label titleLabel;
-    @FXML private TextArea titleField;
+    @FXML private TextField titleField;
 
     // DESCRIPTION
     @FXML private Label descriptionLabel;
@@ -99,6 +106,14 @@ public class CreatePostController {
                 // also automatically updates the Post.image
         }
     }   
+
+    @FXML
+    void handleDragOver(DragEvent event) {
+        if (event.getGestureSource() != imageView && event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY);
+        }
+        event.consume();
+    }
 
     @FXML
     void handleStarClicked(MouseEvent event) {
@@ -175,11 +190,7 @@ public class CreatePostController {
 
     @FXML
     void cancelPost() {
-
-        // CLOSE WINDOW get back to previous screen (main feed)
-        imageDropArea.getScene().getWindow().hide();
-
-            // no need to clear and reset everything cause we create a new CreatePostController (with empty Post and unselected fields) every time we open the CreatePost screen
+        MainWin.showFeed();
     }
 
     @FXML
@@ -215,12 +226,34 @@ public class CreatePostController {
         // only proceed if there's nothing missing
         if (!error) {
 
-            // 4. save Post to db
-                // TO DO. create a FeedController w/ ObservableList<Post> feedPosts
-                // feedPosts.add(currentPost);
+            try (DbAccessManager dbManager = new DbAccessManager()) {
+                String username = CurrentUserContext.getUsername();
+                User currentUser = dbManager.findUserByUsername(username);
+
+                if (currentUser == null) {
+                    currentUser = new User(username, username + "@example.com");
+                    currentUser.setBio("");
+                    currentUser.setLocation("");
+                    dbManager.saveUser(currentUser);
+                }
+
+                long postsBefore = dbManager.countPostsByUsername(username);
+                currentUser.addPost(currentPost);
+                dbManager.updateUser(currentUser);
+                long postsAfter = dbManager.countPostsByUsername(username);
+
+                if (postsAfter > postsBefore) {
+                    System.out.println("[DB CHECK] Post stored successfully for user '" + username + "'. Total posts: " + postsAfter);
+                } else {
+                    System.out.println("[DB CHECK] Warning: post count did not increase for user '" + username + "'. Before=" + postsBefore + ", After=" + postsAfter);
+                }
+            } catch (Exception e) {
+                errorLabel.setText("Error saving post: " + e.getMessage());
+                errorLabel.setVisible(true);
+                return;
+            }
         
-            // 5. CLOSE WINDOW get back to previous screen (main feed)
-            imageDropArea.getScene().getWindow().hide();
+            MainWin.showFeed();
         }
     }
 
@@ -229,11 +262,11 @@ public class CreatePostController {
 
         boolean missing = false;
         
-        // missing image upload
+        /*  missing image upload
         if ( currentPost.getImage() == null ) {
             imageUploadLabel.setStyle("-fx-text-fill: red");
             missing = true;
-        }
+        }*/
 
         // missing title
         if ( titleField.getText().isEmpty() ) {

@@ -4,25 +4,53 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import javafx.scene.image.Image;
 
+@Entity
+@Table(name = "posts")
 public class Post {
 
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO-INCREMENT ID
 	private Long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false, length = 1500)
     private String description;
+
     private boolean isFavourite;
     private double starRating = 0.0; // 1-5
+
+    @ElementCollection
+    @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "tag")
+    @Enumerated(EnumType.STRING)
     private List<Tag> tags = new ArrayList<>(); // ENUM of tags
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private LocalDate date;
 
     
     // IMAGE
+    @Transient
     private Image image;
     private String imagePath;
 
@@ -30,6 +58,14 @@ public class Post {
     }
 
     // GETTERS & SETTERS
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -97,6 +133,14 @@ public class Post {
     
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
     
 }

@@ -1,4 +1,4 @@
-package com.example.usermodel;
+package eus.ehu.usermodel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,3 +94,4 @@ public class User {
 
     
 }
+

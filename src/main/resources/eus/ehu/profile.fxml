@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="480.0" prefWidth="780.0" spacing="18.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controllers.ProfileController">
+<HBox prefHeight="480.0" prefWidth="780.0" spacing="18.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.ehu.controllers.ProfileController">
    <padding>
       <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
    </padding>
@@ -65,3 +65,4 @@
       </VBox>
    </children>
 </HBox>
+

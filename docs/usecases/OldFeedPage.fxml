@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #fefce8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.controllers.FeedController">
+<BorderPane prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #fefce8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.ehu.controllers.FeedController">
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!--  TOP NAVIGATION BAR                                     -->
@@ -302,3 +302,4 @@
     </center>
 
 </BorderPane>
+

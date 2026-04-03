@@ -1,9 +1,9 @@
-package com.example.controllers;
+package eus.ehu.controllers;
 
-import com.example.MainWin;
-import com.example.data_access.DbAccessManager;
-import com.example.usermodel.Post;
-import com.example.usermodel.Tag;
+import eus.ehu.MainWin;
+import eus.ehu.data_access.DbAccessManager;
+import eus.ehu.usermodel.Post;
+import eus.ehu.usermodel.Tag;
 
 import java.util.Optional;
 

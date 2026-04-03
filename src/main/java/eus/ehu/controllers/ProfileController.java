@@ -1,14 +1,14 @@
-package com.example.controllers;
+package eus.ehu.controllers;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.MainWin;
-import com.example.data_access.CurrentUserContext;
-import com.example.data_access.DbAccessManager;
-import com.example.usermodel.Post;
-import com.example.usermodel.User;
+import eus.ehu.MainWin;
+import eus.ehu.data_access.CurrentUserContext;
+import eus.ehu.data_access.DbAccessManager;
+import eus.ehu.usermodel.Post;
+import eus.ehu.usermodel.User;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -220,3 +220,4 @@ public class ProfileController {
         favourite3.setImage(null);
     }
 }
+

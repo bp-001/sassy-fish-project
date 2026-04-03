@@ -1,4 +1,4 @@
-package com.example.data_access;
+package eus.ehu.data_access;
 
 import org.h2.tools.Server;
 

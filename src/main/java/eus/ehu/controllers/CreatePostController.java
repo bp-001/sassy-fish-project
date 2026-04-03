@@ -1,16 +1,16 @@
-package com.example.controllers;
+package eus.ehu.controllers;
 
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import com.example.MainWin;
-import com.example.data_access.CurrentUserContext;
-import com.example.data_access.DbAccessManager;
-import com.example.usermodel.Post;
-import com.example.usermodel.Tag;
-import com.example.usermodel.User;
+import eus.ehu.MainWin;
+import eus.ehu.data_access.CurrentUserContext;
+import eus.ehu.data_access.DbAccessManager;
+import eus.ehu.usermodel.Post;
+import eus.ehu.usermodel.Tag;
+import eus.ehu.usermodel.User;
 
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -345,3 +345,4 @@ public class CreatePostController {
     }
 
 }
+

@@ -14,7 +14,8 @@
 
 
         <property name="hibernate.physical_naming_strategy">org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl</property>
-        <mapping class="com.example.usermodel.User" />
-        <mapping class="com.example.usermodel.Post" />
+        <mapping class="eus.ehu.usermodel.User" />
+        <mapping class="eus.ehu.usermodel.Post" />
     </session-factory>
 </hibernate-configuration>
+

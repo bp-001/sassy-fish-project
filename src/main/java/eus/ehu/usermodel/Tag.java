@@ -1,4 +1,4 @@
-package com.example.usermodel;
+package eus.ehu.usermodel;
 
 public enum Tag {
 
@@ -12,3 +12,4 @@ public enum Tag {
     OTHER
 
 }
+

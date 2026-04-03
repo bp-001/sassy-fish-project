@@ -1,4 +1,4 @@
-package com.example.data_access;
+package eus.ehu.data_access;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -9,8 +9,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import com.example.usermodel.Post;
-import com.example.usermodel.User;
+import eus.ehu.usermodel.Post;
+import eus.ehu.usermodel.User;
 
 public class DbAccessManager implements AutoCloseable {
     private final StandardServiceRegistry registry;
@@ -137,3 +137,4 @@ public class DbAccessManager implements AutoCloseable {
         T execute();
     }
 }
+

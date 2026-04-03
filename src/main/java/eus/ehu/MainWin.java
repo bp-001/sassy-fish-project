@@ -1,13 +1,13 @@
-package com.example;
+package eus.ehu;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.data_access.CurrentUserContext;
-import com.example.data_access.DbAccessManager;
-import com.example.usermodel.User;
+import eus.ehu.data_access.CurrentUserContext;
+import eus.ehu.data_access.DbAccessManager;
+import eus.ehu.usermodel.User;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -82,7 +82,7 @@ public class MainWin extends Application {
     }
 
     private static Parent loadView(String fxml) throws IOException {
-        URL resource = MainWin.class.getResource("/com/example/" + fxml);
+        URL resource = MainWin.class.getResource("/eus/ehu/" + fxml);
         if (resource == null) {
             throw new IOException("FXML not found: " + fxml);
         }
